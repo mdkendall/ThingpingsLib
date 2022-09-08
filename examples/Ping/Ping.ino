@@ -19,7 +19,7 @@ void setup() {
     Serial.println(WiFi.localIP());
 
     /* Send a ping to Thingpings */
-    Thingpings::ping("ExampleCompany", "ExampleWidget");
+    Thingpings::ping("Example Company", "Example Widget");
     Serial.println("Sent ping to Thingpings");
 }
 

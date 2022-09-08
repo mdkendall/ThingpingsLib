@@ -6,6 +6,21 @@
 
 namespace Thingpings {
 
+    String urlEncode(const char* s) {
+        const char* hex = "0123456789ABCDEF";
+        String enc = "";
+        char c;
+        while ((c = *s++) != '\0') {
+            if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') enc += c;
+            else {
+                enc += '%';
+                enc += hex[c >> 4];
+                enc += hex[c & 0x0F];
+            }
+        }
+        return enc;
+    }
+
     void ping(const char* vendor, const char* product) {
         ping(vendor, product, "/", 80);
     }
@@ -23,7 +38,7 @@ namespace Thingpings {
 
         snprintf(url, sizeof(url), "http://www.thingpings.com/api/ping?l=%s&v=%s&p=%s&s=%04X%08X&t=%s&r=%u",
             WiFi.localIP().toString().c_str(),
-            vendor, product,
+            urlEncode(vendor).c_str(), urlEncode(product).c_str(),
             (uint16_t)(chipid>>32), (uint32_t)chipid,
             path, port);
 
