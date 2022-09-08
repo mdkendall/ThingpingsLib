@@ -1,0 +1,2 @@
+# ThingpingsLib
+Thingpings Arduino library
