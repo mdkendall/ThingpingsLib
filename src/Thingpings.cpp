@@ -1,8 +1,15 @@
 #include "Thingpings.h"
 
 #include <Arduino.h>
-#include <WiFi.h>
-#include <HTTPClient.h>
+#if defined(ARDUINO_ARCH_ESP32)
+    #include <WiFi.h>
+    #include <WiFiClient.h>
+    #include <HTTPClient.h>
+#elif defined(ARDUINO_ARCH_ESP8266)
+    #include <ESP8266WiFi.h>
+    #include <WiFiClient.h>
+    #include <ESP8266HTTPClient.h>
+#endif
 
 namespace Thingpings {
 
@@ -31,18 +38,22 @@ namespace Thingpings {
 
     void ping(const char* vendor, const char* product, const char* path, unsigned int port) {
 
+        WiFiClient client;
         HTTPClient http;
         char url[256];
 
-        uint64_t chipid = ESP.getEfuseMac();
-
-        snprintf(url, sizeof(url), "http://www.thingpings.com/api/ping?l=%s&v=%s&p=%s&s=%04X%08X&t=%s&r=%u",
+#if defined(ARDUINO_ARCH_ESP32)
+        snprintf(url, sizeof(url), "http://www.thingpings.com/api/ping?l=%s&v=%s&p=%s&s=%012llX&t=%s&r=%u",
             WiFi.localIP().toString().c_str(),
             urlEncode(vendor).c_str(), urlEncode(product).c_str(),
-            (uint16_t)(chipid>>32), (uint32_t)chipid,
-            path, port);
-
-        http.begin(url);
+            ESP.getEfuseMac(), path, port);
+#elif defined(ARDUINO_ARCH_ESP8266)
+        snprintf(url, sizeof(url), "http://www.thingpings.com/api/ping?l=%s&v=%s&p=%s&s=%06X&t=%s&r=%u",
+            WiFi.localIP().toString().c_str(),
+            urlEncode(vendor).c_str(), urlEncode(product).c_str(),
+            ESP.getChipId(), path, port);
+#endif
+        http.begin(client, url);
         http.GET();
         http.end();
     }

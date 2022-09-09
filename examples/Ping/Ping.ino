@@ -1,5 +1,10 @@
 
+#if defined(ARDUINO_ARCH_ESP32)
 #include <WiFi.h>
+#elif defined(ARDUINO_ARCH_ESP8266)
+#include <ESP8266WiFi.h>
+#endif
+
 #include <Thingpings.h>
 
 /* Replace with your local wireless network credentials */
@@ -14,7 +19,7 @@ void setup() {
     /* Connect to Wi-Fi */
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, pass);
-    Serial.print("Connecting to WiFi ");
+    Serial.print("Connecting to WiFi .. ");
     while (WiFi.status() != WL_CONNECTED) { delay(100); }
     Serial.println(WiFi.localIP());
 
